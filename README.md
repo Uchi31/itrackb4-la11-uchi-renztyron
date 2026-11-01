@@ -7,4 +7,4 @@
 -- the first thing that i encountered is the intl error on db:show --counts and the error says that the intl PHP extension is required to use the format method.
 
 **F3:** (why the Blade files still work after the switch)
--- the controller still passes the same variable names such as books, book, category, and year and a model supports the same $book['title'] access.
+-- the controller still passes the same variable names such as books, book, category, and year and a model supports the same $book['title'] access..
