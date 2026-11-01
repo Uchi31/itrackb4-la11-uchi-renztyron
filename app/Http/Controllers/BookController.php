@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Book;
 
 class BookController extends Controller
 {
@@ -26,34 +27,17 @@ class BookController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $books = $this->getBooks();
+{
+    $category = $request->query('category', '');
+    $year = $request->query('year', '');
 
-        $category = $request->query('category', '');
-        $year = $request->query('year', '');
+    $books = Book::query()
+        ->when($category !== '', fn ($q) => $q->where('category', $category))
+        ->when($year !== '', fn ($q) => $q->where('year', $year))
+        ->get();
 
-        if ($category !== '') {
-            foreach ($books as $key => $book) {
-                if ($book['category'] !== $category) {
-                    unset($books[$key]);
-                }
-            }
-        }
-
-        if ($year !== '') {
-            foreach ($books as $key => $book) {
-                if ($book['year'] != $year) {
-                    unset($books[$key]);
-                }
-            }
-        }
-
-        return view('books.index', [
-            'books' => $books,
-            'category' => $category,
-            'year' => $year,
-        ]);
-    }
+    return view('books.index', compact('books', 'category', 'year'));
+}
 
     public function create()
     {
@@ -61,42 +45,24 @@ class BookController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|max:255',
-            'author' => 'required|max:255',
-            'year' => 'required|numeric|min:1000|max:2026',
-            'category' => 'required|in:Motivation,Self-Help,Psychology',
-        ]);
+{
+    $validated = $request->validate([
+        'title' => 'required|max:255',
+        'author' => 'required|max:255',
+        'year' => 'required|numeric|min:1000|max:2026',
+        'category' => 'required|in:Motivation,Self-Help,Psychology',
+    ]);
 
-        $books = $this->getBooks();
+    Book::create($validated);
 
-        $newId = empty($books) ? 1 : max(array_keys($books)) + 1;
+    return redirect()->route('books.index')->with('success', 'Book added successfully!');
+}
 
-        $books[$newId] = [
-            'id' => $newId,
-            'title' => $validated['title'],
-            'author' => $validated['author'],
-            'year' => (int) $validated['year'],
-            'category' => $validated['category'],
-        ];
-
-        $this->saveBooks($books);
-
-        return redirect()->route('books.index')
-            ->with('success', 'Book added successfully!');
-    }
-
-    public function show(string $id)
-    {
-        $books = $this->getBooks();
-
-        if (!isset($books[$id])) {
-            abort(404);
-        }
-
-        return view('books.show', ['book' => $books[$id]]);
-    }
+    public function show($id)
+{
+    $book = Book::findOrFail($id);
+    return view('books.show', compact('book'));
+}
 
     public function edit(string $id)
     {
@@ -114,10 +80,8 @@ class BookController extends Controller
     }
 
     public function featured()
-    {
-        $books = $this->getBooks();
-        $featured = $books[3];
-
-        return view('books.show', ['book' => $featured]);
-    }
+{
+    $book = Book::findOrFail(3);
+    return view('books.show', compact('book'));
+}
 }
