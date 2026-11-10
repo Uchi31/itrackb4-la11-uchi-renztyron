@@ -28,13 +28,13 @@
 
         <div>
             <label>Category</label><br>
-            <select name="category">
+            <select name="category_id">
                 <option value="">Choose a category</option>
-                <option value="Motivation" @selected(old('category') == 'Motivation')>Motivation</option>
-                <option value="Self-Help" @selected(old('category') == 'Self-Help')>Self-Help</option>
-                <option value="Psychology" @selected(old('category') == 'Psychology')>Psychology</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>
+                @endforeach
             </select>
-            @error('category') <span>{{ $message }}</span> @enderror
+            @error('category_id') <span>{{ $message }}</span> @enderror
         </div>
 
         <br>

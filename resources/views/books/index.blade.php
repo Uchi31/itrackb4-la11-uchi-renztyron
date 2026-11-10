@@ -3,15 +3,14 @@
 @section('title', 'All Books')
 
 @section('content')
+    <p><a href="{{ route('books.create') }}" class="btn btn-primary">Add books</a></p>
 
-<a href="{{ route('books.create')}}" class="btn btn-primary mb-3">Add books</a>
     <p>
         Filter by category:
-        <a href="{{ route('books.index', ['category' => 'Motivation', 'year' => $year]) }}">Motivation</a>
-        |
-        <a href="{{ route('books.index', ['category' => 'Self-Help', 'year' => $year]) }}">Self-Help</a>
-        |
-        <a href="{{ route('books.index', ['category' => 'Psychology', 'year' => $year]) }}">Psychology</a>
+        @foreach ($categories as $cat)
+            <a href="{{ route('books.index', ['category' => $cat->id, 'year' => $year]) }}">{{ $cat->name }}</a>
+            @if (! $loop->last) | @endif
+        @endforeach
     </p>
 
     <p>
@@ -24,7 +23,7 @@
     <p>
         @if ($category || $year)
             Active filters:
-            @if ($category) Category: {{ $category }} @endif
+            @if ($category) Category: {{ $categories->find($category)?->name }} @endif
             @if ($year) Year: {{ $year }} @endif
             |
             <a href="{{ route('books.index') }}">Clear all filters</a>
@@ -40,17 +39,19 @@
                     <th>#</th>
                     <th>Title</th>
                     <th>Author</th>
+                    <th>Category</th>
                     <th>Year</th>
                 </tr>
         @endif
 
         <tr>
             <td>{{ $loop->iteration }}</td>
-            <td><a href="{{ route('books.show', $book['id']) }}">{{ $book['title'] }}</a></td>
-            <td>{{ $book['author'] }}</td>
+            <td><a href="{{ route('books.show', $book->id) }}">{{ $book->title }}</a></td>
+            <td>{{ $book->author }}</td>
+            <td>{{ $book->category->name }}</td>
             <td>
-                {{ $book['year'] }}
-                @if ($book['year'] < 1950)
+                {{ $book->year }}
+                @if ($book->year < 1950)
                     <span>(Classic)</span>
                 @endif
             </td>

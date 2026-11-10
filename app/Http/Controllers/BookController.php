@@ -2,67 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Models\Category;
+use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    private function getBooks()
+    public function index(Request $request)
     {
-        $path = storage_path('app/data/books.json');
-        $data = json_decode(file_get_contents($path), true);
+        $category = $request->query('category');
+        $year = $request->query('year');
 
-        $books = [];
-        foreach ($data as $book) {
-            $books[$book['id']] = $book;
+        $categories = Category::all();
+
+        $query = Book::with('category');
+
+        if ($category) {
+            $query = $query->where('category_id', $category);
         }
 
-        return $books;
+        if ($year) {
+            $query = $query->where('year', $year);
+        }
+
+        $books = $query->get();
+
+        return view('books.index', compact('books', 'category', 'year', 'categories'));
     }
-
-    private function saveBooks($books)
-    {
-        $path = storage_path('app/data/books.json');
-        file_put_contents($path, json_encode(array_values($books), JSON_PRETTY_PRINT));
-    }
-
-    public function index(Request $request)
-{
-    $category = $request->query('category', '');
-    $year = $request->query('year', '');
-
-    $books = Book::query()
-        ->when($category !== '', fn ($q) => $q->where('category', $category))
-        ->when($year !== '', fn ($q) => $q->where('year', $year))
-        ->get();
-
-    return view('books.index', compact('books', 'category', 'year'));
-}
 
     public function create()
     {
-        return view('books.create');
+        $categories = Category::all();
+        return view('books.create', compact('categories'));
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'title' => 'required|max:255',
-        'author' => 'required|max:255',
-        'year' => 'required|numeric|min:1000|max:2026',
-        'category' => 'required|in:Motivation,Self-Help,Psychology',
-    ]);
+    {
+        $validated = $request->validate([
+            'title' => 'required|max:255',
+            'author' => 'required|max:255',
+            'year' => 'required|numeric|min:1000|max:2026',
+            'category_id' => 'required|exists:categories,id',
+        ]);
 
-    Book::create($validated);
+        Book::create($validated);
 
-    return redirect()->route('books.index')->with('success', 'Book added successfully!');
-}
+        return redirect()->route('books.index')
+            ->with('success', 'Book added successfully!');
+    }
 
     public function show($id)
-{
-    $book = Book::findOrFail($id);
-    return view('books.show', compact('book'));
-}
+    {
+        $book = Book::findOrFail($id);
+        return view('books.show', compact('book'));
+    }
 
     public function edit(string $id)
     {
@@ -80,8 +73,8 @@ class BookController extends Controller
     }
 
     public function featured()
-{
-    $book = Book::findOrFail(3);
-    return view('books.show', compact('book'));
-}
+    {
+        $book = Book::findOrFail(3);
+        return view('books.show', compact('book'));
+    }
 }

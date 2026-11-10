@@ -1,10 +1,16 @@
-## Lab Activity 9
+## Lab Activity 10
 
-**F1:** (which column is nullable and why that one)
--- publisher is nullable because a book can exist without a known publisher, but not without a title, author, category or year.
+Question:
+G1
+Which column did you turn into a table, and why that one and not another?
+-- I turn category into a table because it comes from a fixed list, repeats across many books, and could later need its own details.
+G2
+What number did screenshot 6 show, and why exactly that number?
+-- The screenshot 6 showed queries:7, which is 1 query for thhe 6 books plus 1 per book for its category.
+G3
+Your belongsTo method is named in the singular. What would break if you made it plural?
+-- Eloquents adds _id to the method name, co category() finds category_id. A plural categories() would look for categories_id, which  doesnt exist, so the pages would break.
 
-**F2:** (which step failed first and what the error said)
--- the first thing that i encountered is the intl error on db:show --counts and the error says that the intl PHP extension is required to use the format method.
 
-**F3:** (why the Blade files still work after the switch)
--- the controller still passes the same variable names such as books, book, category, and year and a model supports the same $book['title'] access..
+
+
