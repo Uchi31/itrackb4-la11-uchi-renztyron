@@ -41,6 +41,7 @@
                     <th>Author</th>
                     <th>Category</th>
                     <th>Year</th>
+                    <th>Actions</th>
                 </tr>
         @endif
 
@@ -54,6 +55,14 @@
                 @if ($book->year < 1950)
                     <span>(Classic)</span>
                 @endif
+            </td>
+            <td>
+                <a href="{{ route('books.edit', $book) }}">Edit</a>
+                <form action="{{ route('books.destroy', $book) }}" method="POST"onsubmit="return confirm('Delete this record?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
             </td>
         </tr>
 

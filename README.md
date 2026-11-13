@@ -1,15 +1,18 @@
-## Lab Activity 10
+## Lab Activity 11
 
-Question:
 G1
-Which column did you turn into a table, and why that one and not another?
--- I turn category into a table because it comes from a fixed list, repeats across many books, and could later need its own details.
+Route model binding needs two things to be true. Name both, and say what happens when only one of them is.
+-- Route model binding needs the parameter type-hinted with my model (`Book $book`) and its name to match the route segment (`{book}`). If only one is true, no real record arrives and there is no error, which is why `/books/999` still gave a 404 without any `findOrFail`.
+
 G2
-What number did screenshot 6 show, and why exactly that number?
--- The screenshot 6 showed queries:7, which is 1 query for thhe 6 books plus 1 per book for its category.
+Your Delete link opened the detail page instead of deleting anything. Explain why.
+-- My Delete link was only an `<a>` tag, which can only send GET, so `route('books.destroy', $book)` opened `/books/1`, my show route, and nothing was deleted. The destroy route only answers DELETE, which is why I replaced the link with a form using `@method('DELETE')`.
+
 G3
-Your belongsTo method is named in the singular. What would break if you made it plural?
--- Eloquents adds _id to the method name, co category() finds category_id. A plural categories() would look for categories_id, which  doesnt exist, so the pages would break...
+old() takes a second argument on your edit form. What would break if you left it out, and what would break if you used only it?
+-- Without the second argument, `old('title')` has no fallback, so my edit form opened with every field empty. With only the second argument, a rejected submit throws away what I typed and brings back the saved values, but using both kept my new Author in the box.
+
+
 
 
 
