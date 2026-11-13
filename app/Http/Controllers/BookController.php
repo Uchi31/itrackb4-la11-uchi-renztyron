@@ -51,25 +51,35 @@ class BookController extends Controller
             ->with('success', 'Book added successfully!');
     }
 
-    public function show($id)
+    public function show(Book $book)
     {
-        $book = Book::findOrFail($id);
         return view('books.show', compact('book'));
     }
 
-    public function edit(string $id)
+    public function edit(Book $book)
     {
-        //
+        $categories = Category::all();
+        return view('books.edit', compact('book', 'categories'));
     }
 
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, Book $book)
+{
+    $validated = $request->validate([
+        'title' => 'required|max:255',
+        'author' => 'required|max:255',
+        'year' => 'required|numeric|min:1000|max:2026',
+        'category_id' => 'required|exists:categories,id',
+    ]);
 
-    public function destroy(string $id)
+    $book->update($validated);
+
+    return redirect()->route('books.index');
+}
+
+    public function destroy(Book $book)
     {
-        //
+        $book->delete();
+        return redirect()->route('books.index');
     }
 
     public function featured()
